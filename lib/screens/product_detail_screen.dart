@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/product.dart';
 import '../providers/product_provider.dart';
@@ -13,12 +14,17 @@ class ProductDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProductProvider>(context);
+
+    // ✅ Définir la localisation du produit pour Google Map
+    final LatLng productLocation = LatLng(product.lat, product.lng);
+
     return Scaffold(
       appBar: AppBar(title: Text(product.name)),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Image du produit
             CachedNetworkImage(
               imageUrl: product.image,
               width: double.infinity,
@@ -33,11 +39,13 @@ class ProductDetailScreen extends StatelessWidget {
                 child: Center(child: Icon(Icons.error, size: 50)),
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Nom et prix
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -59,6 +67,8 @@ class ProductDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
+
+                  // Score
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -77,11 +87,15 @@ class ProductDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
+
+                  // Catégories
                   Text(
                     "${product.categoryLevel1} > ${product.categoryLevel2} ${product.categoryLevel3 == "__none__" ? "" : " > ${product.categoryLevel3}"}",
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 16),
+
+                  // Description
                   ExpansionTile(
                     title: const Text(
                       "Description",
@@ -98,6 +112,8 @@ class ProductDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
+
+                  // Stock et provider
                   Row(
                     children: [
                       Chip(
@@ -118,6 +134,8 @@ class ProductDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 24),
+
+                  // Bouton Ajouter / Retirer de la comparaison
                   Consumer<ProductProvider>(
                     builder: (context, provider, _) {
                       final isInCompare = provider.isInCompare(product);
@@ -166,7 +184,31 @@ class ProductDetailScreen extends StatelessWidget {
                       );
                     },
                   ),
+
+                  // ✅ Google Map
+                  Container(
+                    height: 200,
+                    margin: const EdgeInsets.symmetric(vertical: 16),
+                    child: GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: productLocation,
+                        zoom: 14,
+                      ),
+                      markers: {
+                        Marker(
+                          markerId: MarkerId(product.ref),
+                          position: productLocation,
+                          infoWindow: InfoWindow(title: product.name),
+                        ),
+                      },
+                      zoomControlsEnabled: false,
+                      myLocationButtonEnabled: false,
+                    ),
+                  ),
+
                   const SizedBox(height: 32),
+
+                  // Suggestions
                   const Text(
                     "Suggestions",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -174,7 +216,6 @@ class ProductDetailScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   Consumer<ProductProvider>(
                     builder: (context, provider, _) {
-                      // Simple suggestion logic: same category level 2, excluding current product
                       final suggestions = provider.products
                           .where(
                             (p) =>
@@ -212,9 +253,11 @@ class ProductDetailScreen extends StatelessWidget {
           ],
         ),
       ),
+
+      // Floating Action Button pour comparaison
       floatingActionButton: (provider.isZero)
           ? FloatingActionButton(
-            mini: true,
+              mini: true,
               onPressed: () {},
               child: Icon(Icons.compare_arrows),
             )

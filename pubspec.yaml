@@ -39,6 +39,9 @@ dependencies:
   google_fonts: ^7.0.2
   http: ^1.6.0
 
+  # ✅ Dépendance Google Maps Flutter ajoutée
+  google_maps_flutter: ^2.4.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

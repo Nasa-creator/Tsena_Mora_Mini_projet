@@ -5,7 +5,7 @@ from ollama import chat
 
 
 class Adviser:
-    def __init__(self, model: str = "ministral-3:3b"):
+    def __init__(self, model: str = "mistral:latest"):
         self.model = model
         # ðŸ”‘ IMPORTANT : Docker / local compatible
         os.environ.setdefault(

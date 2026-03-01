@@ -4,6 +4,12 @@
         android:label="product_versus_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <!-- GOOGLE MAPS API KEY -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyD4Pg0bGOWNdm5W66RI6bTNACf-YQv4bnQ"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

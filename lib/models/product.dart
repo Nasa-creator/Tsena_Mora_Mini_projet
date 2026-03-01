@@ -11,6 +11,10 @@ class Product {
   final bool inStock;
   final double score;
 
+  // ✅ Ajouter latitude et longitude
+  final double lat;
+  final double lng;
+
   Product({
     required this.name,
     required this.description,
@@ -23,6 +27,8 @@ class Product {
     required this.categoryLevel3,
     required this.inStock,
     this.score = 0.0,
+    required this.lat,
+    required this.lng,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -38,6 +44,10 @@ class Product {
       categoryLevel3: json['category_level3'] ?? '',
       inStock: json['in_stock'] ?? false,
       score: (json['score'] ?? 0).toDouble(),
+
+      // ✅ récupérer lat et lng depuis le JSON, ou mettre 0.0 par défaut
+      lat: (json['lat'] ?? 0.0).toDouble(),
+      lng: (json['lng'] ?? 0.0).toDouble(),
     );
   }
 }

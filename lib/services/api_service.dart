@@ -7,7 +7,7 @@ import 'dart:io';
 class ApiService {
   static String get baseUrl {
     if (Platform.isAndroid) {
-      return "http://10.54.116.145:8000";
+      return "http://192.168.11.254:8000";
     }
     return "http://127.0.0.1:8000";
   }
@@ -32,12 +32,14 @@ class ApiService {
 
   Future<Map<String, dynamic>> getCategories() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/products/categories'));
+      final response = await http.get(
+        Uri.parse('$baseUrl/products/categories'),
+      );
 
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-         throw Exception('Failed to load categories');
+        throw Exception('Failed to load categories');
       }
     } catch (e) {
       print("Error fetching categories: $e");
@@ -50,19 +52,25 @@ class ApiService {
       final response = await http.post(
         Uri.parse('$baseUrl/ai/advice'),
         headers: {"Content-Type": "application/json"},
-        body: json.encode(products.map((p) => {
-          "name": p.name,
-          "description": p.description,
-          "ref": p.ref,
-          "image": p.image,
-          "price": p.price,
-          "provider": p.provider,
-          "category_level1": p.categoryLevel1,
-          "category_level2": p.categoryLevel2,
-          "category_level3": p.categoryLevel3,
-          "in_stock": p.inStock,
-          "score": p.score,
-        }).toList()),
+        body: json.encode(
+          products
+              .map(
+                (p) => {
+                  "name": p.name,
+                  "description": p.description,
+                  "ref": p.ref,
+                  "image": p.image,
+                  "price": p.price,
+                  "provider": p.provider,
+                  "category_level1": p.categoryLevel1,
+                  "category_level2": p.categoryLevel2,
+                  "category_level3": p.categoryLevel3,
+                  "in_stock": p.inStock,
+                  "score": p.score,
+                },
+              )
+              .toList(),
+        ),
       );
 
       if (response.statusCode == 200) {
