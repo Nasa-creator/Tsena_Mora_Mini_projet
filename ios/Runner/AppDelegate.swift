@@ -9,7 +9,7 @@ import UIKit
   ) -> Bool {
 
     <!-- GOOGLE MAPS API KEY -->
-    GMSServices.provideAPIKey("AIzaSyD4Pg0bGOWNdm5W66RI6bTNACf-YQv4bnQ")
+    GMSServices.provideAPIKey("AIzaSyC5APQeJaD5zChCnyU7ExryjApv5XBf2HA")
 
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)

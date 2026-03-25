@@ -12,6 +12,8 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
+  TextEditingController searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -19,6 +21,20 @@ class _ProductListScreenState extends State<ProductListScreen> {
       () =>
           Provider.of<ProductProvider>(context, listen: false).fetchProducts(),
     );
+
+    // Écoute les changements dans la barre de recherche
+    searchController.addListener(() {
+      Provider.of<ProductProvider>(
+        context,
+        listen: false,
+      ).searchProduct(searchController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -81,7 +97,38 @@ class _ProductListScreenState extends State<ProductListScreen> {
           }
           return Column(
             children: [
-              // Filters
+              // ── Search Bar ──────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Rechercher un produit...',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              searchController.clear();
+                              Provider.of<ProductProvider>(
+                                context,
+                                listen: false,
+                              ).searchProduct('');
+                            },
+                          )
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surfaceVariant,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                  ),
+                ),
+              ),
+
+              // ── Filters ─────────────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -161,20 +208,59 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   ],
                 ),
               ),
-              Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(8),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+
+              // ── Résultat de recherche ────────────────────────────────
+              if (searchController.text.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${provider.products.length} résultat(s) pour "${searchController.text}"',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
                   ),
-                  itemCount: provider.products.length,
-                  itemBuilder: (context, index) {
-                    return ProductCard(product: provider.products[index]);
-                  },
                 ),
+
+              // ── Grid ────────────────────────────────────────────────
+              Expanded(
+                child: provider.products.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.search_off,
+                              size: 64,
+                              color: Theme.of(context).colorScheme.outline,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Aucun produit trouvé',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : GridView.builder(
+                        padding: const EdgeInsets.all(8),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.75,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                            ),
+                        itemCount: provider.products.length,
+                        itemBuilder: (context, index) {
+                          return ProductCard(product: provider.products[index]);
+                        },
+                      ),
               ),
             ],
           );

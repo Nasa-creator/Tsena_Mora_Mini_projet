@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:label="product_versus_app"
         android:name="${applicationName}"
@@ -8,7 +10,7 @@
         <!-- GOOGLE MAPS API KEY -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyD4Pg0bGOWNdm5W66RI6bTNACf-YQv4bnQ"/>
+            android:value="AIzaSyC5APQeJaD5zChCnyU7ExryjApv5XBf2HA"/>
 
         <activity
             android:name=".MainActivity"

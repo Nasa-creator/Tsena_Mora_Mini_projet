@@ -14,8 +14,8 @@ class MockApiService {
       categoryLevel2: "Phones",
       categoryLevel3: "Smartphones",
       inStock: true,
-      lat: 37.3349, // Exemple : Cupertino
-      lng: -122.0090,
+      lat: -18.1496,
+      lng: 49.4023,
     ),
     Product(
       name: "Samsung Galaxy S24",
@@ -29,8 +29,8 @@ class MockApiService {
       categoryLevel2: "Phones",
       categoryLevel3: "Smartphones",
       inStock: true,
-      lat: 37.5665, // Exemple : Séoul
-      lng: 126.9780,
+      lat: -18.1496,
+      lng: 49.4023,
     ),
     Product(
       name: "MacBook Air M3",
@@ -44,8 +44,8 @@ class MockApiService {
       categoryLevel2: "Laptops",
       categoryLevel3: "Ultrabooks",
       inStock: true,
-      lat: 37.3349, // Exemple : Cupertino
-      lng: -122.0090,
+      lat: -18.1496,
+      lng: 49.4023,
     ),
     Product(
       name: "Dell XPS 13",
@@ -59,8 +59,8 @@ class MockApiService {
       categoryLevel2: "Laptops",
       categoryLevel3: "Ultrabooks",
       inStock: false,
-      lat: 37.5665, // Exemple : Séoul
-      lng: 126.9780,
+      lat: -18.1496,
+      lng: 49.4023,
     ),
     Product(
       name: "Men's T-Shirt",
@@ -74,8 +74,8 @@ class MockApiService {
       categoryLevel2: "Men",
       categoryLevel3: "Tops",
       inStock: true,
-      lat: 37.3349, // Exemple : Cupertino
-      lng: -122.0090,
+      lat: -18.1496,
+      lng: 49.4023,
     ),
     Product(
       name: "Women's Dress",
@@ -89,8 +89,8 @@ class MockApiService {
       categoryLevel2: "Women",
       categoryLevel3: "Dresses",
       inStock: true,
-      lat: 37.5665, // Exemple : Séoul
-      lng: 126.9780,
+      lat: -18.1496,
+      lng: 49.4023,
     ),
     Product(
       name: "Modern Sofa",
@@ -104,8 +104,8 @@ class MockApiService {
       categoryLevel2: "Furniture",
       categoryLevel3: "Living Room",
       inStock: true,
-      lat: 37.3349, // Exemple : Cupertino
-      lng: -122.0090,
+      lat: -18.1496,
+      lng: 49.4023,
     ),
   ];
 

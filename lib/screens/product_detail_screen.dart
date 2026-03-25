@@ -5,28 +5,53 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../models/product.dart';
 import '../providers/product_provider.dart';
 import '../widgets/product_card.dart';
+import '../services/geocoding_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailScreen extends StatefulWidget {
   final Product product;
 
   const ProductDetailScreen({super.key, required this.product});
 
   @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  String? productAddress;
+
+  get _providerLocation => null;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAddress();
+  }
+
+  Future<void> _loadAddress() async {
+    final address = await GeocodingService.getAddress(
+      widget.product.location.latitude,
+      widget.product.location.longitude,
+    );
+    setState(() {
+      productAddress = address ?? "Adresse non trouvée";
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ProductProvider>(context);
-
-    // ✅ Définir la localisation du produit pour Google Map
-    final LatLng productLocation = LatLng(product.lat, product.lng);
+    final LatLng productLocation = widget.product.location;
 
     return Scaffold(
-      appBar: AppBar(title: Text(product.name)),
+      appBar: AppBar(title: Text(widget.product.name)),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image du produit
             CachedNetworkImage(
-              imageUrl: product.image,
+              imageUrl: widget.product.image,
               width: double.infinity,
               height: 300,
               fit: BoxFit.contain,
@@ -51,13 +76,13 @@ class ProductDetailScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          product.name,
+                          widget.product.name,
                           style: Theme.of(context).textTheme.headlineSmall
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                       Text(
-                        "MGA ${product.price.toStringAsFixed(2)}",
+                        "MGA ${widget.product.price.toStringAsFixed(2)}",
                         style: Theme.of(context).textTheme.headlineSmall
                             ?.copyWith(
                               color: Theme.of(context).primaryColor,
@@ -79,7 +104,7 @@ class ProductDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      "Score: ${product.score.toStringAsFixed(1)}",
+                      "Score: ${widget.product.score.toStringAsFixed(1)}",
                       style: TextStyle(
                         color: Colors.amber[900],
                         fontWeight: FontWeight.bold,
@@ -90,7 +115,7 @@ class ProductDetailScreen extends StatelessWidget {
 
                   // Catégories
                   Text(
-                    "${product.categoryLevel1} > ${product.categoryLevel2} ${product.categoryLevel3 == "__none__" ? "" : " > ${product.categoryLevel3}"}",
+                    "${widget.product.categoryLevel1} > ${widget.product.categoryLevel2} ${widget.product.categoryLevel3 == "__none__" ? "" : " > ${widget.product.categoryLevel3}"}",
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 16),
@@ -105,7 +130,7 @@ class ProductDetailScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          product.description,
+                          widget.product.description,
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ),
@@ -118,19 +143,19 @@ class ProductDetailScreen extends StatelessWidget {
                     children: [
                       Chip(
                         label: Text(
-                          product.inStock ? "In Stock" : "Out of Stock",
+                          widget.product.inStock ? "In Stock" : "Out of Stock",
                         ),
-                        backgroundColor: product.inStock
+                        backgroundColor: widget.product.inStock
                             ? Colors.green[100]
                             : Colors.red[100],
                         labelStyle: TextStyle(
-                          color: product.inStock
+                          color: widget.product.inStock
                               ? Colors.green[800]
                               : Colors.red[800],
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Chip(label: Text("Provider: ${product.provider}")),
+                      Chip(label: Text("Provider: ${widget.product.provider}")),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -138,20 +163,20 @@ class ProductDetailScreen extends StatelessWidget {
                   // Bouton Ajouter / Retirer de la comparaison
                   Consumer<ProductProvider>(
                     builder: (context, provider, _) {
-                      final isInCompare = provider.isInCompare(product);
+                      final isInCompare = provider.isInCompare(widget.product);
                       return SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           onPressed: () {
                             if (isInCompare) {
-                              provider.removeFromCompare(product);
+                              provider.removeFromCompare(widget.product);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Removed from comparison"),
                                 ),
                               );
                             } else {
-                              provider.addToCompare(product);
+                              provider.addToCompare(widget.product);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Added to comparison"),
@@ -185,29 +210,69 @@ class ProductDetailScreen extends StatelessWidget {
                     },
                   ),
 
-                  // ✅ Google Map
-                  Container(
-                    height: 200,
-                    margin: const EdgeInsets.symmetric(vertical: 16),
-                    child: GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: productLocation,
-                        zoom: 14,
-                      ),
-                      markers: {
-                        Marker(
-                          markerId: MarkerId(product.ref),
-                          position: productLocation,
-                          infoWindow: InfoWindow(title: product.name),
+                  // Google Map
+                  const SizedBox(height: 16),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: SizedBox(
+                      height: 250,
+                      child: GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: productLocation,
+                          zoom: 16.5,
                         ),
-                      },
-                      zoomControlsEnabled: false,
-                      myLocationButtonEnabled: false,
+                        markers: {
+                          Marker(
+                            markerId: MarkerId(widget.product.ref),
+                            position: productLocation,
+                            infoWindow: InfoWindow(
+                              title: widget.product.name,
+                              snippet: productAddress ?? "Chargement...",
+                            ),
+                          ),
+                        },
+                        zoomControlsEnabled: true,
+                        myLocationButtonEnabled: false,
+                        liteModeEnabled: false,
+                      ),
                     ),
                   ),
 
+                  // Bouton ouvrir dans Google Maps
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final query = Uri.encodeComponent(
+                          "${widget.product.provider} Madagascar",
+                        );
+                        final url = Uri.parse(
+                          "https://www.google.com/maps/search/?api=1&query=$query",
+                        );
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(
+                            url,
+                            mode: LaunchMode.externalApplication,
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.map_outlined),
+                      label: const Text("Ouvrir dans Google Maps"),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        foregroundColor: Colors.green[700],
+                        side: BorderSide(color: Colors.green[700]!),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 32),
-
+                  //Text(
+                  //  "Provider: ${widget.product.provider}\n"
+                  //  "Location: $_providerLocation\n"
+                  //  "Adresse: $productAddress",
+                  //  style: const TextStyle(fontSize: 10, color: Colors.red),
+                  //),
                   // Suggestions
                   const Text(
                     "Suggestions",
@@ -219,8 +284,9 @@ class ProductDetailScreen extends StatelessWidget {
                       final suggestions = provider.products
                           .where(
                             (p) =>
-                                p.categoryLevel2 == product.categoryLevel2 &&
-                                p.ref != product.ref,
+                                p.categoryLevel2 ==
+                                    widget.product.categoryLevel2 &&
+                                p.ref != widget.product.ref,
                           )
                           .take(4)
                           .toList();
@@ -254,12 +320,12 @@ class ProductDetailScreen extends StatelessWidget {
         ),
       ),
 
-      // Floating Action Button pour comparaison
+      // Floating Action Button
       floatingActionButton: (provider.isZero)
           ? FloatingActionButton(
               mini: true,
               onPressed: () {},
-              child: Icon(Icons.compare_arrows),
+              child: const Icon(Icons.compare_arrows),
             )
           : Badge(
               label: Text("${provider.countCompare}"),

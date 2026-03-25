@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../services/api_service.dart';
@@ -7,7 +9,7 @@ class ProductProvider with ChangeNotifier {
 
   List<Product> _allProducts = [];
   List<Product> _filteredProducts = [];
-  List<Product> _comparisonList = [];
+  final List<Product> _comparisonList = [];
 
   bool _isLoading = false;
   String? _selectedCategoryLevel1;
@@ -112,5 +114,16 @@ class ProductProvider with ChangeNotifier {
 
   Future<String> getAdvice() async {
     return await _apiService.getAdvice(_comparisonList);
+  }
+
+  void searchProduct(String query) {
+    if (query.isEmpty) {
+      _filteredProducts = List.from(_allProducts);
+    } else {
+      _filteredProducts = _allProducts
+          .where((p) => p.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+    notifyListeners();
   }
 }

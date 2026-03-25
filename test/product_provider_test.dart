@@ -27,8 +27,8 @@ void main() {
         categoryLevel2: "Cat2",
         categoryLevel3: "Cat3",
         inStock: true,
-        lat: -18.8792,
-        lng: 47.5079,
+        lat: -18.1496,
+        lng: 49.4023,
       );
 
       provider.addToCompare(product);

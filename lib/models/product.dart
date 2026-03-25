@@ -1,3 +1,5 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 class Product {
   final String name;
   final String description;
@@ -10,8 +12,6 @@ class Product {
   final String categoryLevel3;
   final bool inStock;
   final double score;
-
-  // ✅ Ajouter latitude et longitude
   final double lat;
   final double lng;
 
@@ -44,10 +44,14 @@ class Product {
       categoryLevel3: json['category_level3'] ?? '',
       inStock: json['in_stock'] ?? false,
       score: (json['score'] ?? 0).toDouble(),
-
-      // ✅ récupérer lat et lng depuis le JSON, ou mettre 0.0 par défaut
       lat: (json['lat'] ?? 0.0).toDouble(),
       lng: (json['lng'] ?? 0.0).toDouble(),
     );
+  }
+
+  //juste Antananarivo si rien
+  LatLng get location {
+    if (lat != 0.0 && lng != 0.0) return LatLng(lat, lng);
+    return const LatLng(-18.870945, 47.512343);
   }
 }

@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/product.dart';
-
 import 'dart:io';
 
 class ApiService {
   static String get baseUrl {
     if (Platform.isAndroid) {
-      return "http://192.168.11.254:8000";
+      return "http://10.16.226.42:8000";
     }
     return "http://127.0.0.1:8000";
   }
